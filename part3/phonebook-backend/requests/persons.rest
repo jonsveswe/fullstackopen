@@ -9,3 +9,11 @@ content-type: application/json
     "name": "ercxvf",
     "number": "5752"
 }
+###
+POST https://fullstackopen-6h8d.onrender.com/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "ercxvf",
+    "number": "5752"
+}
