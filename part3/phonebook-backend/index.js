@@ -5,6 +5,7 @@ const cors = require('cors')
 
 app.use(cors())
 app.use(express.json())
+app.use(express.static('dist'))
 
 morgan.token('body', function (req, res) { 
     return JSON.stringify(req.body)
@@ -69,7 +70,7 @@ app.get('/api/persons/:id', (request, response) => {
 const generateId = () => {
     const min = 1
     const max = 1000000
-    return Math.floor(Math.random() * (max - min) + min)
+    return String(Math.floor(Math.random() * (max - min) + min))
 }
 
 app.post('/api/persons', (request, response) => {

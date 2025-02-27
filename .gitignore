@@ -106,7 +106,7 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+#dist                                       Needed for deploying to Render
 
 # Gatsby files
 .cache/
