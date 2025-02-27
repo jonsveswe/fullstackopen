@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // const baseUrl = 'http://localhost:3001/persons'; // Use with JSON Server
 // const baseUrl = 'http://localhost:3001/api/persons'; // Use with backend from part 3
-const baseUrl = '/api/persons'; // Use with backend from part 3 when we serve static files frontend files from backend.
+const baseUrl = '/api/persons'; // Relative Url. Use with backend from part 3 when we serve static files frontend files from backend.
 
 const getAllPersons = () => {
     return axios.get(baseUrl).then(response => {
