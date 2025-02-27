@@ -94,7 +94,17 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
-
+app.delete('/api/persons/:id', (request, response) => {
+    const id = request.params.id
+    const person = phonebook.find(person => person.id === id)
+    if (person) {
+        phonebook = phonebook.filter(person => person.id !== id)
+        response.json(person) // 200 (OK) and the person in the body data. 
+    } else {
+        response.statusMessage = `Person with id ${id} was not found`
+        response.status(404).end()
+    }
+})
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

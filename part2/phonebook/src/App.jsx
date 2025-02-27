@@ -63,7 +63,7 @@ const App = () => {
     setNewNumber('')
   }
   const handleDeletePerson = (person) => {
-    console.log('inside handleDeletePerson id: ', person)
+    console.log('inside handleDeletePerson person: ', person)
     if (window.confirm(`Do you really want to delete person ${person.name}?`)) {
       personDbService.deleteOnePerson(person.id).then(data => {
         console.log('inside handleDeletePerson deleteOnePerson data: ', data)
