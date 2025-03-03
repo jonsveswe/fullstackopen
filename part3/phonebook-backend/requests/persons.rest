@@ -6,8 +6,8 @@ POST http://localhost:3001/api/persons HTTP/1.1
 content-type: application/json
 
 {
-    "name": "dfgdf",
-    "number": "4564"
+    "name": "klööö",
+    "number": "45645-4464645"
 }
 ###
 POST https://fullstackopen-6h8d.onrender.com/api/persons HTTP/1.1
@@ -33,6 +33,6 @@ PUT http://localhost:3001/api/persons/67c56e000ee5950b7db803c7 HTTP/1.1
 content-type: application/json
 
 {
-    "name": "jonas",
-    "number": "22"
+    "name": "kolö",
+    "number": "4567"
 }

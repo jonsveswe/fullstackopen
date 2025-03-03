@@ -35,29 +35,36 @@ const App = () => {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         let personToUpdate = persons.find(person => person.name === newPerson.name)
         personToUpdate = { ...personToUpdate, number: newNumber }
-        personDbService.updateOnePerson(personToUpdate.id, personToUpdate).then(data => {
-          console.log('inside handleAddPerson updateOnePerson data: ', data)
-          console.log(persons.map(person => person.id === data.id ? data : person))
-          setPersons(persons.map(person => person.id === data.id ? data : person))
-          setSuccessMessage(`Updated ${personToUpdate.name}'s number to ${personToUpdate.number}`)
-          setTimeout(() => { setSuccessMessage(null) }, 3000)
-        }).catch(error => {
-          console.log('inside handleAddPerson updateOnePerson error: ', error)
-          setErrorMessage(`The person ${personToUpdate.name} was already deleted from server`)
-          setTimeout(() => { setErrorMessage(null) }, 3000)
-          setPersons(persons.filter(person => person.id !== personToUpdate.id))
-        })
+        personDbService
+          .updateOnePerson(personToUpdate.id, personToUpdate)
+          .then(data => {
+            console.log('inside handleAddPerson updateOnePerson data: ', data)
+            console.log(persons.map(person => person.id === data.id ? data : person))
+            setPersons(persons.map(person => person.id === data.id ? data : person))
+            setSuccessMessage(`Updated ${personToUpdate.name}'s number to ${personToUpdate.number}`)
+            setTimeout(() => { setSuccessMessage(null) }, 3000)
+          }).catch(error => {
+            console.log('inside handleAddPerson updateOnePerson error: ', error)
+            // setErrorMessage(`The person ${personToUpdate.name} was deleted from server`)
+            setErrorMessage(`${error.response.data.error}`)
+            setTimeout(() => { setErrorMessage(null) }, 3000)
+            // setPersons(persons.filter(person => person.id !== personToUpdate.id))
+          })
       }
     } else {
-      personDbService.addOnePerson(newPerson).then(data => {
-        console.log('inside handleAddPerson addOnePerson data: ', data)
-        // Remember never mutate state directly! concat() returns a new copy of the persons array. 
-        setPersons(persons.concat(data))
-        setSuccessMessage(`Added ${newPerson.name} with number ${newPerson.number} to the phonebook`)
-        setTimeout(() => { setSuccessMessage(null) }, 3000)
-      }).catch(error => {
-        console.log('inside handleAddPerson addOnePerson error: ', error)
-      })
+      personDbService
+        .addOnePerson(newPerson)
+        .then(data => {
+          console.log('inside handleAddPerson addOnePerson data: ', data)
+          // Remember never mutate state directly! concat() returns a new copy of the persons array. 
+          setPersons(persons.concat(data))
+          setSuccessMessage(`Added ${newPerson.name} with number ${newPerson.number} to the phonebook`)
+          setTimeout(() => { setSuccessMessage(null) }, 3000)
+        }).catch(error => {
+          console.log('inside handleAddPerson addOnePerson error: ', error)
+          setErrorMessage(`${error.response.data.error}`)
+          setTimeout(() => { setErrorMessage(null) }, 3000)
+        })
     }
     setNewName('')
     setNewNumber('')
@@ -91,8 +98,8 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
-      <Notification message={successMessage} type='success'/>
-      <Notification message={errorMessage} type='error'/>
+      <Notification message={successMessage} type='success' />
+      <Notification message={errorMessage} type='error' />
       <Filter filterString={filterString} onChange={handleFilterStringChange} />
       <h2>Add a new</h2>
       <PersonForm onSubmit={handleAddPerson} newName={newName} newNumber={newNumber} onChangeName={handleNameChange} onChangeNumber={handleNumberChange} />
