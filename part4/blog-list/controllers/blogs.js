@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const BlogModel = require('../models/blog')
 const UserModel = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await BlogModel.find({}).populate('user_id', { username: 1, name: 1 })
@@ -25,12 +26,28 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogsRouter.post('/', async (request, response, next) => {
-  const body = request.body
-  console.log('body: ', body)
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
 
-  const user = await UserModel.findById(body.user_id)
-  /* Example response:
+blogsRouter.post('/', async (request, response, next) => {
+  try {
+    const body = request.body
+    console.log('body: ', body)
+
+    // The object decoded from the token contains the username and id fields,
+    // since we added them to the token in the loginRouter.post() when token was made.
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    console.log('decodedToken: ', decodedToken)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'no user found for token' })
+    }
+    const user = await UserModel.findById(decodedToken.id)
+    /* Example response:
     user:  {
     _id: new ObjectId('67cac5e905bac8d0696f6eb7'),
     username: 'hejhejda',
@@ -41,17 +58,16 @@ blogsRouter.post('/', async (request, response, next) => {
   }
   */
 
-  const blog = new BlogModel({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0, // default value 0 if body.likes is undefined
-    // Note that user_id has type "type: mongoose.Schema.Types.ObjectId, ref: 'User'",
-    // so we can't use the simple string body.user_id.
-    user_id: user._id
-  })
+    const blog = new BlogModel({
+      title: body.title,
+      author: body.author,
+      url: body.url,
+      likes: body.likes || 0, // default value 0 if body.likes is undefined
+      // Note that user_id has type "type: mongoose.Schema.Types.ObjectId, ref: 'User'",
+      // so we can't use the simple string body.user_id.
+      user_id: user._id
+    })
 
-  try {
     const savedBlog = await blog.save()
     user.blog_ids = user.blog_ids.concat(savedBlog._id)
     await user.save()

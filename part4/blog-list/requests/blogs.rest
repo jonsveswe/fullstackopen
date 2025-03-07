@@ -2,7 +2,7 @@ GET http://localhost:3001/api/blogs
 ###
 GET http://localhost:3001/api/blogs/67c705bccce08bd00efe171c
 ###
-POST http://localhost:3001/api/blogs HTTP/1.1
+POST http://localhost:3001/api/blogs
 content-type: application/json
 
 {
@@ -13,3 +13,40 @@ content-type: application/json
   "user_id": "67cac5e905bac8d0696f6eb7"
 }
 ###
+POST http://localhost:3001/api/blogs
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlamhlamRhIiwiaWQiOiI2N2NhYzVlOTA1YmFjOGQwNjk2ZjZlYjciLCJpYXQiOjE3NDEzNTIzMzB9.fLPpkT_yn6ATBcHojSIhHXmBRdPTlTVBKXlgzcrJZGc
+
+{
+  "title": "eldVatten2",
+  "author": "sdf",
+  "url": "www.cvb.com",
+  "likes": 3,
+  "user_id": "67cac5e905bac8d0696f6eb7"
+}
+###
+// Invalid format of token
+POST http://localhost:3001/api/blogs
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlamhlamRhIiwiaWQiOiI2N2NhYzVlOTA1YmFjOGQwNjk2ZjZlYjciLCJpYXQiOjE3NDEzNTIzMzB9.fLPpkT_yn6ATBcHojSIhHXmBRdPTlTVBKXlgzcrJZGc
+
+{
+  "title": "eldVatten3",
+  "author": "sdf",
+  "url": "www.cvb.com",
+  "likes": 3,
+  "user_id": "67cac5e905bac8d0696f6eb7"
+}
+###
+// Valid format but no use for token
+POST http://localhost:3001/api/blogs
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1AiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlamhlamRhIiwiaWQiOiI2N2NhYzVlOTA1YmFjOGQwNjk2ZjZlYjciLCJpYXQiOjE3NDEzNTIzMzB9.fLPpkT_yn6ATBcHojSIhHXmBRdPTlTVBKXlgzcrJZGc
+
+{
+  "title": "eldVatten3",
+  "author": "sdf",
+  "url": "www.cvb.com",
+  "likes": 3,
+  "user_id": "67cac5e905bac8d0696f6eb7"
+}
