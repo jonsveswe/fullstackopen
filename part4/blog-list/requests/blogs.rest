@@ -6,35 +6,10 @@ POST http://localhost:3001/api/blogs HTTP/1.1
 content-type: application/json
 
 {
-  "title": "op",
+  "title": "eld",
   "author": "dfg",
-  "url": "www.b.com",
-  "likes": 3445
+  "url": "www.bdd.com",
+  "likes": 323,
+  "user_id": "67cac5e905bac8d0696f6eb7"
 }
 ###
-POST https://fullstackopen-6h8d.onrender.com/api/persons HTTP/1.1
-content-type: application/json
-
-{
-    "name": "ercxvf",
-    "number": "5752"
-}
-###
-// Wrong format of id to throw error
-GET http://localhost:3001/api/persons/67c5865112b0f277fa96bdf
-### 
-// Correct format id but no person with that id
-GET http://localhost:3001/api/persons/67c56cb7e600885b27460f21
-### 
-// unknown endpoint
-GET http://localhost:3001/api/hej
-### 
-DELETE http://localhost:3001/api/persons/67c56cb7e6008b27460f21
-###
-PUT http://localhost:3001/api/persons/67c56e000ee5950b7db803c7 HTTP/1.1
-content-type: application/json
-
-{
-    "name": "kolö",
-    "number": "4567"
-}

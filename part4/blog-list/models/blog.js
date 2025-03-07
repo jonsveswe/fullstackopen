@@ -10,7 +10,11 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  likes: Number
+  likes: Number,
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 /* const blogSchema = new mongoose.Schema({
@@ -20,6 +24,7 @@ const blogSchema = new mongoose.Schema({
   likes: Number
 }) */
 
+// This transformation is done when we send back the blog in the response. Like so: "response.json(blog)"
 blogSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()

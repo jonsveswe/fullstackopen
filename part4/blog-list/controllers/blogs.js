@@ -1,8 +1,9 @@
 const blogsRouter = require('express').Router()
-const BlogModel = require('../models/blog.js')
+const BlogModel = require('../models/blog')
+const UserModel = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await BlogModel.find({})
+  const blogs = await BlogModel.find({}).populate('user_id', { username: 1, name: 1 })
   response.json(blogs)
 
   /*   BlogModel
@@ -13,35 +14,52 @@ blogsRouter.get('/', async (request, response) => {
 
 })
 
+blogsRouter.get('/:id', async (request, response) => {
+  const blog = await BlogModel.findById(request.params.id)
+  console.log('request.params.id: ', request.params.id)
+  console.log('blog: ', blog)
+  if (blog) {
+    response.json(blog)
+  } else {
+    response.status(404).end()
+  }
+})
+
 blogsRouter.post('/', async (request, response, next) => {
   const body = request.body
-  // const blog = new BlogModel(request.body)
-  // const blog = new BlogModel(body)
+  console.log('body: ', body)
 
-  /*   if (!body.title || !body.url) {
-    return response.status(400).json({ error: 'title or url missing' })
-  } */
+  const user = await UserModel.findById(body.user_id)
+  /* Example response:
+    user:  {
+    _id: new ObjectId('67cac5e905bac8d0696f6eb7'),
+    username: 'hejhejda',
+    name: 'jonasdd',
+    passwordHash: '$2b$10$.LSdq5RfoC6UQ4tYobHd/Oa7Om0uyAwlb/oqOQqrP67akRrqapD.q',
+    blog_ids: [],
+    __v: 0
+  }
+  */
 
   const blog = new BlogModel({
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes || 0 // default value 0 if body.likes is undefined
+    likes: body.likes || 0, // default value 0 if body.likes is undefined
+    // Note that user_id has type "type: mongoose.Schema.Types.ObjectId, ref: 'User'",
+    // so we can't use the simple string body.user_id.
+    user_id: user._id
   })
 
   try {
-    const result = await blog.save()
-    response.status(201).json(result) // 201 = resource created
+    const savedBlog = await blog.save()
+    user.blog_ids = user.blog_ids.concat(savedBlog._id)
+    await user.save()
+    response.status(201).json(savedBlog) // 201 = resource created
   } catch (exception) {
     console.log(exception)
     next(exception)
   }
-
-  /*   blog
-    .save()
-    .then(result => {
-      response.status(201).json(result) // 201 = resource created
-    }) */
 
 })
 
