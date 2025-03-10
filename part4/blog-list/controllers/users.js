@@ -2,13 +2,9 @@ const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const UserModel = require('../models/user')
 
-usersRouter.get('/', async (request, response, next) => {
-  try {
-    const users = await UserModel.find({}).populate('blog_ids', { title: 1, author: 1 })
-    response.json(users)
-  } catch (error) {
-    next(error)
-  }
+usersRouter.get('/', async (request, response) => {
+  const users = await UserModel.find({}).populate('blog_ids', { title: 1, author: 1 })
+  response.json(users)
 })
 
 usersRouter.get('/:id', async (request, response) => {
@@ -21,7 +17,7 @@ usersRouter.get('/:id', async (request, response) => {
   }
 })
 
-usersRouter.post('/', async (request, response, next) => {
+usersRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
 
   // "Manual" validation since our User model doesn't have password but passwordHash.
@@ -37,13 +33,8 @@ usersRouter.post('/', async (request, response, next) => {
     name,
     passwordHash,
   })
-
-  try {
-    const savedUser = await user.save()
-    response.status(201).json(savedUser)
-  } catch (exception) {
-    next(exception)
-  }
+  const savedUser = await user.save()
+  response.status(201).json(savedUser)
 })
 
 module.exports = usersRouter

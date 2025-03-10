@@ -2,6 +2,7 @@ const config = require('./utils/config')
 const express = require('express')
 const app = express()
 const cors = require('cors')
+require('express-async-errors') // must be imported before routes. Makes it so that you don't have to use try-catch blocks
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')

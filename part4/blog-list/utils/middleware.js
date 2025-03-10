@@ -12,15 +12,14 @@ const tokenExtractor = (request, response, next) => {
 }
 
 const userExtractor = async (request, response, next) => {
-  try {
-    // The object decoded from the token contains the username and id fields,
-    // since we added them to the token in the loginRouter.post() when token was made.
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'no user found for token' })
-    }
-    const user = await User.findById(decodedToken.id)
-    /* Example response:
+  // The object decoded from the token contains the username and id fields,
+  // since we added them to the token in the loginRouter.post() when token was made.
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'no user found for token' })
+  }
+  const user = await User.findById(decodedToken.id)
+  /* Example response:
       user:  {
         _id: new ObjectId('67cac5e905bac8d0696f6eb7'),
         username: 'hejhejda',
@@ -30,12 +29,8 @@ const userExtractor = async (request, response, next) => {
         __v: 0
       }
       */
-    request.user = user
-    next()
-  } catch (error) {
-    next(error)
-  }
-
+  request.user = user
+  next()
 }
 
 const requestLogger = (request, response, next) => {
