@@ -1,4 +1,42 @@
 const logger = require('./logger')
+const jwt = require('jsonwebtoken')
+const User = require('../models/user')
+
+// Add the token to the request object so we can easily access it in the controllers.
+const tokenExtractor = (request, response, next) => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    request.token = authorization.replace('Bearer ', '')
+  }
+  next()
+}
+
+const userExtractor = async (request, response, next) => {
+  try {
+    // The object decoded from the token contains the username and id fields,
+    // since we added them to the token in the loginRouter.post() when token was made.
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'no user found for token' })
+    }
+    const user = await User.findById(decodedToken.id)
+    /* Example response:
+      user:  {
+        _id: new ObjectId('67cac5e905bac8d0696f6eb7'),
+        username: 'hejhejda',
+        name: 'jonasdd',
+        passwordHash: '$2b$10$.LSdq5RfoC6UQ4tYobHd/Oa7Om0uyAwlb/oqOQqrP67akRrqapD.q',
+        blog_ids: [],
+        __v: 0
+      }
+      */
+    request.user = user
+    next()
+  } catch (error) {
+    next(error)
+  }
+
+}
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -30,6 +68,8 @@ const errorHandler = (error, request, response, next) => {
 }
 
 module.exports = {
+  tokenExtractor,
+  userExtractor,
   requestLogger,
   unknownEndpoint,
   errorHandler

@@ -1,7 +1,6 @@
 const blogsRouter = require('express').Router()
 const BlogModel = require('../models/blog')
-const UserModel = require('../models/user')
-const jwt = require('jsonwebtoken')
+const middleware = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await BlogModel.find({}).populate('user_id', { username: 1, name: 1 })
@@ -26,38 +25,27 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-const getTokenFrom = request => {
+/* const getTokenFrom = request => {
   const authorization = request.get('authorization')
   if (authorization && authorization.startsWith('Bearer ')) {
     return authorization.replace('Bearer ', '')
   }
   return null
-}
+} */
 
-blogsRouter.post('/', async (request, response, next) => {
+blogsRouter.post('/', middleware.userExtractor, async (request, response, next) => {
   try {
     const body = request.body
     console.log('body: ', body)
 
-    // The object decoded from the token contains the username and id fields,
-    // since we added them to the token in the loginRouter.post() when token was made.
-    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    /*     const decodedToken = jwt.verify(request.token, process.env.SECRET) // request.token comes from tokenExtractor middleware
     console.log('decodedToken: ', decodedToken)
     if (!decodedToken.id) {
       return response.status(401).json({ error: 'no user found for token' })
     }
-    const user = await UserModel.findById(decodedToken.id)
-    /* Example response:
-    user:  {
-    _id: new ObjectId('67cac5e905bac8d0696f6eb7'),
-    username: 'hejhejda',
-    name: 'jonasdd',
-    passwordHash: '$2b$10$.LSdq5RfoC6UQ4tYobHd/Oa7Om0uyAwlb/oqOQqrP67akRrqapD.q',
-    blog_ids: [],
-    __v: 0
-  }
-  */
+    const user = await UserModel.findById(decodedToken.id) */
 
+    const user = request.user // user comes from userExtractor middleware
     const blog = new BlogModel({
       title: body.title,
       author: body.author,
@@ -82,7 +70,7 @@ blogsRouter.post('/', async (request, response, next) => {
 blogsRouter.put('/:id', async (request, response, next) => {
   const body = request.body
 
-  // Remember to not make a new BlogModel, like when we do a post.
+  // Remember to not make a new BlogModel, like when we do a post, since we want to update the existing one.
   const blog = {
     title: body.title,
     author: body.author,
@@ -99,10 +87,23 @@ blogsRouter.put('/:id', async (request, response, next) => {
   }
 })
 
-blogsRouter.delete('/:id', async (request, response, next) => {
+blogsRouter.delete('/:id', middleware.userExtractor, async (request, response, next) => {
   try {
-    await BlogModel.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+    // Only the user who added the blog can delete it.
+    /*     const decodedToken = jwt.verify(request.token, process.env.SECRET) // request.token comes from tokenExtractor middleware
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'no user found for token' })
+    } */
+
+    const blog = await BlogModel.findById(request.params.id)
+    console.log('blog.user_id: ', blog.user_id)
+    console.log('request.user._id: ', request.user._id)
+    if (blog.user_id.toString() !== request.user._id.toString()) {
+      return response.status(401).json({ error: 'only the user that createsd the blog can delete the it' })
+    }
+
+    const blog2 = await BlogModel.findByIdAndDelete(request.params.id)
+    response.json(blog2) // 200 = OK and blog in the body data
   } catch (error) {
     next(error)
   }

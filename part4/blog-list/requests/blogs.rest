@@ -15,10 +15,10 @@ content-type: application/json
 ###
 POST http://localhost:3001/api/blogs
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlamhlamRhIiwiaWQiOiI2N2NhYzVlOTA1YmFjOGQwNjk2ZjZlYjciLCJpYXQiOjE3NDEzNTIzMzB9.fLPpkT_yn6ATBcHojSIhHXmBRdPTlTVBKXlgzcrJZGc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlamhlamRhIiwiaWQiOiI2N2NhYzVlOTA1YmFjOGQwNjk2ZjZlYjciLCJpYXQiOjE3NDEzNTgyNDIsImV4cCI6MTc0MTM2MTg0Mn0.e5f0GSiU5qpbnsSRYgtdUQ5zmhtJX7ZuF0EMWHL3p8E
 
 {
-  "title": "eldVatten2",
+  "title": "eldVatten5",
   "author": "sdf",
   "url": "www.cvb.com",
   "likes": 3,
@@ -50,3 +50,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1AiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imhla
   "likes": 3,
   "user_id": "67cac5e905bac8d0696f6eb7"
 }
+### 
+DELETE http://localhost:3001/api/blogs/67cb04bdc6f2e0b08987386e
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlamhlamRhIiwiaWQiOiI2N2NhYzVlOTA1YmFjOGQwNjk2ZjZlYjciLCJpYXQiOjE3NDEzNTgyNDIsImV4cCI6MTc0MTM2MTg0Mn0.e5f0GSiU5qpbnsSRYgtdUQ5zmhtJX7ZuF0EMWHL3p8E
