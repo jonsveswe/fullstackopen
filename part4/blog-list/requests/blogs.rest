@@ -53,3 +53,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1AiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imhla
 ### 
 DELETE http://localhost:3001/api/blogs/67cb04bdc6f2e0b08987386e
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlamhlamRhIiwiaWQiOiI2N2NhYzVlOTA1YmFjOGQwNjk2ZjZlYjciLCJpYXQiOjE3NDEzNTgyNDIsImV4cCI6MTc0MTM2MTg0Mn0.e5f0GSiU5qpbnsSRYgtdUQ5zmhtJX7ZuF0EMWHL3p8E
+###
+PUT http://localhost:3001/api/blogs/67d01f63b32c497cd2e80a9d
+content-type: application/json
+
+{
+  "title": "sopl2",
+  "author": "mesa",
+  "url": "www.me.com",
+  "likes": 2,
+  "user_id": "67ceff4b0cd09d52b2a0ebae"
+}

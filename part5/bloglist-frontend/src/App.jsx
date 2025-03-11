@@ -4,6 +4,8 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
+import AddBlogForm from './components/AddBlogForm'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -12,10 +14,11 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  let tokenInApp
+
+  let tokenInAppTest
+
   console.log('Render App')
-  console.log('tokenInApp: ', tokenInApp)
+  console.log('tokenInApp: ', tokenInAppTest)
   console.log('user.token: ', user?.token)
 
   useEffect(() => {
@@ -51,7 +54,7 @@ const App = () => {
         'loggedInBlogAppUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
-      tokenInApp = user.token
+      tokenInAppTest = user.token
       setUser(user)
       setUsername('')
       setPassword('')
@@ -64,22 +67,15 @@ const App = () => {
       }, 5000)
     }
   }
-  const handelLogout = () => {
+  const handleLogout = () => {
     window.localStorage.removeItem('loggedInBlogAppUser')
     blogService.setToken(null)
     setUser(null)
   }
-  const handleAddBlog = async (event) => {
-    event.preventDefault()
+  const addBlog = async (newBlog) => {
     try {
-      const newBlog = {
-        title,
-        author: 'mesa',
-        url: 'www.me.com'
-      }
       const blog = await blogService.create(newBlog)
       setBlogs(blogs.concat(blog))
-      setTitle('')
       setSuccessMessage(`a new blog ${blog.title} by ${blog.author} added`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -91,6 +87,25 @@ const App = () => {
       }, 5000)
     }
   }
+
+  const updateLikes = async (blog) => {
+    const updatedBlog = {
+      ...blog,
+      user_id: blog.user_id.id, // Note that in blog this is an object, but in updatedBlog this is a string that is needed for the PUT.
+      likes: blog.likes + 1
+    }
+    await blogService.update(updatedBlog.id, updatedBlog)
+    setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...b, likes: b.likes + 1 }))
+  }
+
+  const deleteBlog = async (blog) => {
+    if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
+      return
+
+    await blogService.remove(blog.id)
+    setBlogs(blogs.filter(b => b.id !== blog.id))
+  }
+
   return (
     <>
       <h2>blogs</h2>
@@ -104,19 +119,14 @@ const App = () => {
           setPassword={setPassword} />
         :
         <div>
-          <div>{user.name} logged in <button onClick={handelLogout}>logout</button></div>
-          <h1>create new</h1>
-          <form onSubmit={handleAddBlog}>
-            title:
-            <input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-            />
-            <button type="submit">add blog</button>
-          </form>
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
-          )}
+          <div>{user.name} logged in <button onClick={handleLogout}>logout</button></div>
+          <Togglable buttonLabel="new blog">
+            <h1>create new</h1>
+            <AddBlogForm addBlog={addBlog} />
+            {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+              <Blog key={blog.id} blog={blog} updateLikes={updateLikes} deleteBlog={deleteBlog} user={user} />
+            )}
+          </Togglable>
         </div>
       }
     </>

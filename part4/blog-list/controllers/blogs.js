@@ -39,12 +39,14 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
 
 blogsRouter.put('/:id', async (request, response) => {
   const body = request.body
+  console.log('body: ', body)
   // Remember to not make a new BlogModel, like when we do a post, since we want to update the existing one.
   const blog = {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes || 0 // default value 0 if body.likes is undefined
+    likes: body.likes || 0, // default value 0 if body.likes is undefined
+    user_id: body.user_id
   }
   const updatedBlog = await BlogModel.findByIdAndUpdate(request.params.id, blog, { new: true })
   response.json(updatedBlog)
