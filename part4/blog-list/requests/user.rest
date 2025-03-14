@@ -1,14 +1,14 @@
 GET http://localhost:3001/api/users
 ###
-GET http://localhost:3001/api/users/67cac5e905bac8d0696f6eb7
+GET http://localhost:3001/api/users/67cee3516757bcca6dde1075
 ###
 POST http://localhost:3001/api/users HTTP/1.1
 content-type: application/json
 
 {
-    "username": "hejhejda",
-    "name": "jonasdd",
-    "password": "asdf1234sdf"
+    "username": "root",
+    "name": "jonas",
+    "password": "1234"
 }
 ###
 // Password too short
@@ -30,3 +30,5 @@ content-type: application/json
     "name": "jonasdd",
     "password": "afghfg3"
 }
+###
+DELETE http://localhost:3001/api/users/67cee3516757bcca6dde1075

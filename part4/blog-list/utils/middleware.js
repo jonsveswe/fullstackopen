@@ -15,10 +15,18 @@ const userExtractor = async (request, response, next) => {
   // The object decoded from the token contains the username and id fields,
   // since we added them to the token in the loginRouter.post() when token was made.
   const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  console.log('process.env.SECRET: ', process.env.SECRET)
+  console.log('request.token: ', request.token)
+  console.log('decodedToken: ', decodedToken)
+
   if (!decodedToken.id) {
-    return response.status(401).json({ error: 'no user found for token' })
+    return response.status(401).json({ error: 'No user found for token. Try logout and reloading the page or user might have been deleted'  })
   }
   const user = await User.findById(decodedToken.id)
+  if (!user) {
+    return response.status(401).json({ error: 'No user found for token. Try logout and reloading the page or user might have been deleted' })
+  }
+  console.log('user: ', user)
   /* Example response:
       user:  {
         _id: new ObjectId('67cac5e905bac8d0696f6eb7'),

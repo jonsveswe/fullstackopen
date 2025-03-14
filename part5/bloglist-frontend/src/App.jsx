@@ -75,7 +75,9 @@ const App = () => {
   const addBlog = async (newBlog) => {
     try {
       const blog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(blog))
+      // setBlogs(blogs.concat(blog))
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
       setSuccessMessage(`a new blog ${blog.title} by ${blog.author} added`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -99,11 +101,17 @@ const App = () => {
   }
 
   const deleteBlog = async (blog) => {
-    if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
-      return
-
-    await blogService.remove(blog.id)
-    setBlogs(blogs.filter(b => b.id !== blog.id))
+    /*     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
+          return */
+    try {
+      await blogService.remove(blog.id)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+    } catch (exception) {
+      setErrorMessage(`Could not delete blog because: ${exception.response.data.error}`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
   }
 
   return (

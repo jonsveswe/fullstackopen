@@ -14,7 +14,7 @@ const Blog = (props) => {
     setVisible(!visible)
   }
   return (
-    <div style={blogStyle}>
+    <li style={blogStyle}>
       {blog.title} {blog.author} <button id='button-view' onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       {visible && (
         <div>
@@ -26,7 +26,7 @@ const Blog = (props) => {
           <div>user?.name: {user?.name}</div>
         </div>
       )}
-    </div>
+    </li>
   )
 
 }
