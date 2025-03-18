@@ -24,7 +24,7 @@ const initialState = anecdotesAtStart.map(asObject)
 // the action.payload in the function contains the argument provided by calling the action creator
 const anecdoteSlice = createSlice({
   name: 'anecdotes',
-  initialState: initialState,
+  initialState: [],
   reducers: {
     voteAnecdote(state, action) {
       console.log('action.payload in voteAnecdote: ', action.payload)
@@ -32,12 +32,6 @@ const anecdoteSlice = createSlice({
       const id = action.payload
       const anecdoteToChange = state.find(n => n.id === id)
       console.log('anecdoteToChange in voteAnecdote: ', current(anecdoteToChange))
-      /* const changedAnecdote = {
-        ...anecdoteToChange,
-        votes: anecdoteToChange.votes + 1
-      }
-      console.log('changedAnecdote in voteAnecdote: ', changedAnecdote)
-      return state.map(anecdote => anecdote.id !== id ? anecdote : changedAnecdote) */
       return state.map(anecdote => {
         return anecdote.id !== id
           ? anecdote
@@ -45,9 +39,12 @@ const anecdoteSlice = createSlice({
       })
     },
     createAnecdote(state, action) {
-      const text = action.payload
-      return [...state, asObject(text)]
+      const anecdote = action.payload
+      return [...state, anecdote]
     },
+    setAnecdotes(state, action) {
+      return action.payload
+    }
   }
 })
 
@@ -82,5 +79,5 @@ export const voteAnecdote = (id) => {
   }
 } */
 
-export const { voteAnecdote, createAnecdote } = anecdoteSlice.actions
+export const { voteAnecdote, createAnecdote, setAnecdotes } = anecdoteSlice.actions
 export default anecdoteSlice.reducer
