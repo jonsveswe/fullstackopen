@@ -1,4 +1,5 @@
 import { createSlice, current } from '@reduxjs/toolkit'
+import anecdoteService from '../services/anecdotes'
 
 const anecdotesAtStart = [
   'If it hurts, do it more often',
@@ -30,8 +31,6 @@ const anecdoteSlice = createSlice({
       console.log('action.payload in voteAnecdote: ', action.payload)
       console.log('state in voteAnecdote: ', current(state))
       const id = action.payload
-      const anecdoteToChange = state.find(n => n.id === id)
-      console.log('anecdoteToChange in voteAnecdote: ', current(anecdoteToChange))
       return state.map(anecdote => {
         return anecdote.id !== id
           ? anecdote
@@ -48,36 +47,33 @@ const anecdoteSlice = createSlice({
   }
 })
 
-/* const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
-  switch (action.type) {
-  case 'VOTE':
-    console.log('ids', state[0].id, action.payload.id)
-    return state.map(anecdote =>
-      anecdote.id !== action.payload.id
-        ? anecdote
-        : { ...anecdote, votes: anecdote.votes + 1 }
-    )
-  case 'CREATE':
-    return [...state, asObject(action.payload.anecdoteAsText)]
-  default: break
-  }
-  return state
-}
-// These two functions are called Action Creators
-export const createAnecdote = (anecdoteAsText) => {
-  return {
-    type: 'CREATE',
-    payload: { anecdoteAsText: anecdoteAsText }
-  }
-}
-export const voteAnecdote = (id) => {
-  return {
-    type: 'VOTE',
-    payload: { id: id }
-  }
-} */
 
+export const initializeAnecdotes = () => {
+  return async dispatch => {
+    const anecdotes = await anecdoteService.getAll()
+    dispatch(setAnecdotes(anecdotes))
+  }
+}
+
+export const createAnecdoteFcn = (anecdoteAsText) => {
+  return async dispatch => {
+    const newAnecdote = await anecdoteService.createNew(anecdoteAsText)
+    dispatch(createAnecdote(newAnecdote))
+  }
+}
+
+export const voteAnecdoteFcn = (id) => {
+  console.log('id in voteAnecdoteFcn: ', id)
+  return async (dispatch, getState) => {
+    const anecdote = getState().anecdotes.find(anecdote => anecdote.id === id)
+    /*     const anecdotes = await anecdoteService.getAll()
+    const anecdote = anecdotes.find(anecdote => anecdote.id === id) */
+    console.log('anecdote in voteAnecdoteFcn: ', anecdote)
+    const updatedAnecdote = { ...anecdote, votes: anecdote.votes + 1 }
+    await anecdoteService.update(updatedAnecdote)
+    console.log('anecdote.id in voteAnecdoteFcn: ', anecdote.id)
+    dispatch(voteAnecdote(anecdote.id))
+  }
+}
 export const { voteAnecdote, createAnecdote, setAnecdotes } = anecdoteSlice.actions
 export default anecdoteSlice.reducer
