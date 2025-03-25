@@ -6,29 +6,30 @@ import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import AddBlogForm from './components/AddBlogForm'
 import Togglable from './components/Togglable'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setNotificationFcn } from './reducers/notificationReducer'
+import { initializeBlogs, setBlogs } from './reducers/blogReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessage] = useState(null)
-  const [successMessage, setSuccessMessage] = useState(null)
+  // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const dispatch = useDispatch()
-
-  let tokenInAppTest
-
+  const blogs = useSelector(state => state.blogs)
   console.log('Render App')
-  console.log('tokenInApp: ', tokenInAppTest)
   console.log('user.token: ', user?.token)
+  console.log('blogs: ', blogs)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    dispatch(initializeBlogs())
   }, [])
+
+  /*   useEffect(() => {
+      blogService.getAll().then(blogs =>
+        setBlogs(blogs)
+      )
+    }, []) */
 
   useEffect(() => {
     const loggedInUserJSON = window.localStorage.getItem('loggedInBlogAppUser')
@@ -57,18 +58,13 @@ const App = () => {
         'loggedInBlogAppUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
-      tokenInAppTest = user.token
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      // setErrorMessage('wrong credentials')
       dispatch(setNotificationFcn({ errorMessage: 'wrong credentials', successMessage: '' }, 5))
       setUsername('')
       setPassword('')
-      /*       setTimeout(() => {
-              setErrorMessage(null)
-            }, 5000) */
     }
   }
   const handleLogout = () => {
@@ -79,20 +75,11 @@ const App = () => {
   const addBlog = async (newBlog) => {
     try {
       const blog = await blogService.create(newBlog)
-      // setBlogs(blogs.concat(blog))
       const blogs = await blogService.getAll()
-      setBlogs(blogs)
-      // setSuccessMessage(`a new blog ${blog.title} by ${blog.author} added`)
+      dispatch(setBlogs(blogs))
       dispatch(setNotificationFcn({ errorMessage: '', successMessage: `a new blog ${blog.title} by ${blog.author} added` }, 5))
-      /*       setTimeout(() => {
-              setSuccessMessage(null)
-            }, 5000) */
     } catch (exception) {
-      // setErrorMessage(`Could not add blog because: ${exception.response.data.error}`)
       dispatch(setNotificationFcn({ errorMessage: `Could not add blog because: ${exception.response.data.error}`, successMessage: '' }, 5))
-      /*       setTimeout(() => {
-              setErrorMessage(null)
-            }, 5000) */
     }
   }
 
@@ -103,7 +90,7 @@ const App = () => {
       likes: blog.likes + 1
     }
     await blogService.update(updatedBlog.id, updatedBlog)
-    setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...b, likes: b.likes + 1 }))
+    dispatch(setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...b, likes: b.likes + 1 })))
   }
 
   const deleteBlog = async (blog) => {
@@ -111,13 +98,9 @@ const App = () => {
           return */
     try {
       await blogService.remove(blog.id)
-      setBlogs(blogs.filter(b => b.id !== blog.id))
+      dispatch(setBlogs(blogs.filter(b => b.id !== blog.id)))
     } catch (exception) {
-      // setErrorMessage(`Could not delete blog because: ${exception.response.data.error}`)
       dispatch(setNotificationFcn({ errorMessage: `Could not delete blog because: ${exception.response.data.error}`, successMessage: '' }, 5))
-      /*       setTimeout(() => {
-              setErrorMessage(null)
-            }, 5000) */
     }
   }
 
@@ -139,7 +122,8 @@ const App = () => {
           <Togglable buttonLabel="new blog">
             <h1>create new</h1>
             <AddBlogForm addBlog={addBlog} />
-            {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+            {/* sort mutates the array and we are not allowed to mutate the state in react/redux so we have to make a copy */}
+            {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
               <Blog key={blog.id} blog={blog} updateLikes={updateLikes} deleteBlog={deleteBlog} user={user} />
             )}
           </Togglable>
