@@ -6,6 +6,8 @@ import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import AddBlogForm from './components/AddBlogForm'
 import Togglable from './components/Togglable'
+import { useDispatch } from 'react-redux'
+import { setNotificationFcn } from './reducers/notificationReducer'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -14,6 +16,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const dispatch = useDispatch()
 
   let tokenInAppTest
 
@@ -44,11 +47,11 @@ const App = () => {
         username, password
       })
       console.log('user', user)
-      /* user example       
-      { 
-        token: "...", 
-        username: "root", 
-        name: "jonas" 
+      /* user example
+      {
+        token: "...",
+        username: "root",
+        name: "jonas"
       } */
       window.localStorage.setItem(
         'loggedInBlogAppUser', JSON.stringify(user)
@@ -59,12 +62,13 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('wrong credentials')
+      // setErrorMessage('wrong credentials')
+      dispatch(setNotificationFcn({ errorMessage: 'wrong credentials', successMessage: '' }, 5))
       setUsername('')
       setPassword('')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      /*       setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000) */
     }
   }
   const handleLogout = () => {
@@ -78,15 +82,17 @@ const App = () => {
       // setBlogs(blogs.concat(blog))
       const blogs = await blogService.getAll()
       setBlogs(blogs)
-      setSuccessMessage(`a new blog ${blog.title} by ${blog.author} added`)
-      setTimeout(() => {
-        setSuccessMessage(null)
-      }, 5000)
+      // setSuccessMessage(`a new blog ${blog.title} by ${blog.author} added`)
+      dispatch(setNotificationFcn({ errorMessage: '', successMessage: `a new blog ${blog.title} by ${blog.author} added` }, 5))
+      /*       setTimeout(() => {
+              setSuccessMessage(null)
+            }, 5000) */
     } catch (exception) {
-      setErrorMessage(`Could not add blog because: ${exception.response.data.error}`)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      // setErrorMessage(`Could not add blog because: ${exception.response.data.error}`)
+      dispatch(setNotificationFcn({ errorMessage: `Could not add blog because: ${exception.response.data.error}`, successMessage: '' }, 5))
+      /*       setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000) */
     }
   }
 
@@ -107,17 +113,19 @@ const App = () => {
       await blogService.remove(blog.id)
       setBlogs(blogs.filter(b => b.id !== blog.id))
     } catch (exception) {
-      setErrorMessage(`Could not delete blog because: ${exception.response.data.error}`)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      // setErrorMessage(`Could not delete blog because: ${exception.response.data.error}`)
+      dispatch(setNotificationFcn({ errorMessage: `Could not delete blog because: ${exception.response.data.error}`, successMessage: '' }, 5))
+      /*       setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000) */
     }
   }
 
   return (
     <>
       <h2>blogs</h2>
-      <Notification errorMessage={errorMessage} successMessage={successMessage} />
+      {/* <Notification errorMessage={errorMessage} successMessage={successMessage} /> */}
+      <Notification />
       {user === null ?
         <LoginForm
           username={username}
