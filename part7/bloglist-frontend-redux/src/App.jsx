@@ -9,14 +9,16 @@ import Togglable from './components/Togglable'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotificationFcn } from './reducers/notificationReducer'
 import { initializeBlogs, setBlogs } from './reducers/blogReducer'
+import { setUser, clearUser } from './reducers/userReducer'
 
 const App = () => {
   // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
+  // const [user, setUser] = useState(null)
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
   console.log('Render App')
   console.log('user.token: ', user?.token)
   console.log('blogs: ', blogs)
@@ -58,7 +60,7 @@ const App = () => {
         'loggedInBlogAppUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch(setUser(user))
       setUsername('')
       setPassword('')
     } catch (exception) {
@@ -70,7 +72,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedInBlogAppUser')
     blogService.setToken(null)
-    setUser(null)
+    dispatch(clearUser())
   }
   const addBlog = async (newBlog) => {
     try {
