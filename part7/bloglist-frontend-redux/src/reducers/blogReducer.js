@@ -6,14 +6,14 @@ const blogSlice = createSlice({
   name: 'blogs',
   initialState: [],
   reducers: {
-    voteBlog(state, action) {
-      console.log('action.payload in voteBlog: ', action.payload)
-      console.log('state in voteBlog: ', current(state))
+    likeBlog(state, action) {
+      console.log('action.payload in likeBlog: ', action.payload)
+      console.log('state in likeBlog: ', current(state))
       const id = action.payload
       return state.map(blog => {
         return blog.id !== id
           ? blog
-          : { ...blog, votes: blog.votes + 1 }
+          : { ...blog, likes: blog.likes + 1 }
       })
     },
     createBlog(state, action) {
@@ -34,25 +34,36 @@ export const initializeBlogs = () => {
   }
 }
 
-export const createBlogFcn = (blogAsText) => {
+export const createBlogFcn = (blogObj) => {
   return async dispatch => {
-    const newBlog = await blogService.create(blogAsText)
+    const newBlog = await blogService.create(blogObj)
     dispatch(createBlog(newBlog))
   }
 }
-
-export const voteBlogFcn = (id) => {
-  console.log('id in voteBlogFcn: ', id)
+export const deleteBlogFcn = (blog) => {
+  return async (dispatch, getState) => {
+    await blogService.remove(blog.id)
+    dispatch(setBlogs(getState().blogs.filter(b => b.id !== blog.id)))
+  }
+}
+export const likeBlogFcn = (id) => {
+  console.log('id in likeBlogFcn: ', id)
   return async (dispatch, getState) => {
     const blog = getState().blogs.find(blog => blog.id === id)
     /*     const blogs = await blogService.getAll()
     const blog = blogs.find(blog => blog.id === id) */
-    console.log('blog in voteBlogFcn: ', blog)
-    const updatedBlog = { ...blog, votes: blog.votes + 1 }
-    await blogService.update(updatedBlog)
-    console.log('blog.id in voteBlogFcn: ', blog.id)
-    dispatch(voteBlog(blog.id))
+    console.log('blog in likeBlogFcn: ', blog)
+    const updatedBlog = {
+      ...blog,
+      user_id: blog.user_id.id, // Note that in blog this is an object, but in updatedBlog this is a string that is needed for the PUT.
+      likes: blog.likes + 1
+    }
+    // const updatedBlog = { ...blog, likes: blog.likes + 1 }
+    await blogService.update(id, updatedBlog)
+    console.log('blog.id in likeBlogFcn: ', blog.id)
+    dispatch(likeBlog(blog.id))
   }
+
 }
-export const { voteBlog, createBlog, setBlogs } = blogSlice.actions
+export const { likeBlog, createBlog, setBlogs } = blogSlice.actions
 export default blogSlice.reducer

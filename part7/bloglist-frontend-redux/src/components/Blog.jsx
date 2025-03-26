@@ -1,8 +1,15 @@
 import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import blogService from '../services/blogs'
+import { setNotificationFcn } from '../reducers/notificationReducer'
+import { setBlogs, likeBlogFcn, deleteBlogFcn } from '../reducers/blogReducer'
+
 const Blog = (props) => {
-  const { blog, updateLikes, deleteBlog, user } = props
-  console.log('props: ', props)
+  const blog = props.blog
   const [visible, setVisible] = useState(false)
+  const dispatch = useDispatch()
+  // const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -12,6 +19,29 @@ const Blog = (props) => {
   }
   const toggleVisibility = () => {
     setVisible(!visible)
+  }
+  const updateLikes = async (blog) => {
+    console.log('blog in updateLikes: ', blog)
+    /*     const updatedBlog = {
+          ...blog,
+          user_id: blog.user_id.id, // Note that in blog this is an object, but in updatedBlog this is a string that is needed for the PUT.
+          likes: blog.likes + 1
+        }
+        await blogService.update(updatedBlog.id, updatedBlog)
+        dispatch(setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...b, likes: b.likes + 1 }))) */
+    dispatch(likeBlogFcn(blog.id))
+  }
+
+  const deleteBlog = async (blog) => {
+    /*     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
+          return */
+    try {
+      /*       await blogService.remove(blog.id)
+            dispatch(setBlogs(blogs.filter(b => b.id !== blog.id))) */
+      dispatch(deleteBlogFcn(blog))
+    } catch (exception) {
+      dispatch(setNotificationFcn({ errorMessage: `Could not delete blog because: ${exception.response.data.error}`, successMessage: '' }, 5))
+    }
   }
   return (
     <li style={blogStyle}>
