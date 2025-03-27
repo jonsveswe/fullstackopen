@@ -1,18 +1,24 @@
 import { createSlice, current } from '@reduxjs/toolkit'
+import userService from '../services/users'
 
 // the action.payload in the function contains the argument provided by calling the action creator
 const userSlice = createSlice({
-  name: 'user',
-  initialState: null,
+  name: 'users',
+  initialState: [],
   reducers: {
-    setUser(state, action) {
+    setUsers(state, action) {
       return action.payload
-    },
-    clearUser(state, action) {
-      return null
     }
   }
 })
 
-export const { setUser, clearUser } = userSlice.actions
+
+export const initializeUsers = () => {
+  return async dispatch => {
+    const users = await userService.getAll()
+    dispatch(setUsers(users))
+  }
+}
+
+export const { setUsers } = userSlice.actions
 export default userSlice.reducer

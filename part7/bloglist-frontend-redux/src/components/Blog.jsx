@@ -3,13 +3,24 @@ import { useDispatch, useSelector } from 'react-redux'
 import blogService from '../services/blogs'
 import { setNotificationFcn } from '../reducers/notificationReducer'
 import { setBlogs, likeBlogFcn, deleteBlogFcn } from '../reducers/blogReducer'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useParams,
+  useNavigate,
+  useMatch
+} from 'react-router-dom'
 
 const Blog = (props) => {
   const blog = props.blog
+  console.log('blog in Blog: ', blog)
   const [visible, setVisible] = useState(false)
   const dispatch = useDispatch()
   // const blogs = useSelector(state => state.blogs)
-  const user = useSelector(state => state.user)
+  const loggedInUser = useSelector(state => state.loggedInUser)
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -43,17 +54,19 @@ const Blog = (props) => {
       dispatch(setNotificationFcn({ errorMessage: `Could not delete blog because: ${exception.response.data.error}`, successMessage: '' }, 5))
     }
   }
+
+  if (!blog) return null
   return (
     <li style={blogStyle}>
-      {blog.title} {blog.author} <button id='button-view' onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
+      <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link> <button id='button-view' onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       {visible && (
         <div>
           <div>{blog.url}</div>
           <div>likes: {blog.likes} <button id='button-likes' onClick={() => updateLikes(blog)}>+</button></div>
           <div>{blog.user_id?.name ? blog.user_id.name : 'no user'}</div>
-          {blog.user_id?.name === user?.name && <button onClick={() => deleteBlog(blog)}>delete</button>}
+          {blog.user_id?.name === loggedInUser?.name && <button onClick={() => deleteBlog(blog)}>delete</button>}
           <div>blog.user_id?.name: {blog.user_id?.name}</div>
-          <div>user?.name: {user?.name}</div>
+          <div>loggedInUser?.name: {loggedInUser?.name}</div>
         </div>
       )}
     </li>
