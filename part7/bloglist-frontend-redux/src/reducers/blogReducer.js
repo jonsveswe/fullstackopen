@@ -63,7 +63,14 @@ export const likeBlogFcn = (id) => {
     console.log('blog.id in likeBlogFcn: ', blog.id)
     dispatch(likeBlog(blog.id))
   }
-
 }
+
+export const commentBlogFcn = (id, comment) => {
+  return async (dispatch) => {
+    await blogService.comment(id, comment)
+    dispatch(initializeBlogs())
+  }
+}
+
 export const { likeBlog, createBlog, setBlogs } = blogSlice.actions
 export default blogSlice.reducer

@@ -37,6 +37,17 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   response.status(201).json(savedBlog) // 201 = resource created
 })
 
+blogsRouter.post('/:id/comments', async (request, response) => {
+  console.log('request.params.id: ', request.params.id)
+  console.log('request.body.comment: ', request.body.comment)
+  const blog = await BlogModel.findById(request.params.id)
+  console.log('blog: ', blog)
+  blog.comments = blog.comments.concat(request.body.comment)
+  console.log('blog.comments: ', blog.comments)
+  const updatedBlog = await blog.save()
+  response.json(updatedBlog)
+})
+
 blogsRouter.put('/:id', async (request, response) => {
   const body = request.body
   console.log('body: ', body)

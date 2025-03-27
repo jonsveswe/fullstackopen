@@ -14,7 +14,13 @@ const blogSchema = new mongoose.Schema({
   user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  comments: [
+    {
+      type: String,
+      ref: 'Comment'
+    }
+  ]
 })
 
 /* const blogSchema = new mongoose.Schema({

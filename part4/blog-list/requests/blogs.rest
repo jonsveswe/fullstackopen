@@ -1,6 +1,6 @@
 GET http://localhost:3001/api/blogs
 ###
-GET http://localhost:3001/api/blogs/67c705bccce08bd00efe171c
+GET http://localhost:3001/api/blogs/67e4279f7ba9587e9eb13d49
 ###
 POST http://localhost:3001/api/blogs
 content-type: application/json
@@ -63,4 +63,13 @@ content-type: application/json
   "url": "www.me.com",
   "likes": 2,
   "user_id": "67ceff4b0cd09d52b2a0ebae"
+}
+
+###
+// Add a comment
+POST http://localhost:3001/api/blogs/67e4279f7ba9587e9eb13d49/comments
+content-type: application/json
+
+{
+  "comment": "hej hej"
 }

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import blogService from '../services/blogs'
 import { setNotificationFcn } from '../reducers/notificationReducer'
 import { setBlogs, likeBlogFcn, deleteBlogFcn } from '../reducers/blogReducer'
+import AddCommentForm from './AddCommentForm'
 import {
   BrowserRouter as Router,
   Routes,
@@ -67,6 +68,11 @@ const Blog = (props) => {
           {blog.user_id?.name === loggedInUser?.name && <button onClick={() => deleteBlog(blog)}>delete</button>}
           <div>blog.user_id?.name: {blog.user_id?.name}</div>
           <div>loggedInUser?.name: {loggedInUser?.name}</div>
+          <h3>Comments</h3>
+          <AddCommentForm blog={blog} />
+          <ul>
+            {blog.comments?.map((comment, index) => <li key={index}> {comment} </li>)}
+          </ul>
         </div>
       )}
     </li>
