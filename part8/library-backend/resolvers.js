@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken')
 const User = require('./models/user')
 const Book = require('./models/book')
 const Author = require('./models/author')
+const { GraphQLError } = require('graphql')
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
 
 // resolvers defines how GraphQL queries are responded to. The resolvers correspond to the types described in the schema.
 // Book and Author has default resolvers unless otherwise specified. The default resolver for Author looks like:
@@ -154,6 +157,11 @@ const resolvers = {
           }
         })
       }
+
+      // Adding a new book publishes a notification about the operation to all subscribers with PubSub's method publish.
+      // Execution of this line sends a WebSocket message about the added book to all the clients registered in the iterator BOOK_ADDED.
+      pubsub.publish('BOOK_ADDED', { bookAdded: book })
+
       return book
 
     },
@@ -177,7 +185,15 @@ const resolvers = {
       author.born = args.setBornTo
       return author.save()
     }
-  }
+  },
+  // Resolver of the bookAdded subscription registers and saves info about all the clients that do the subscription.
+  // The clients are saved to an "iterator object" called BOOK_ADDED.
+  // The iterator name is an arbitrary string, but to follow the convention, it is the subscription name written in capital letters.
+  Subscription: {
+    bookAdded: {
+      subscribe: async () => pubsub.asyncIterator('BOOK_ADDED') //asyncIterableIterator('BOOK_ADDED'), // asyncIterator('BOOK_ADDED')
+    },
+  },
 }
 
 module.exports = resolvers

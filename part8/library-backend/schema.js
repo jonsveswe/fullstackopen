@@ -53,7 +53,12 @@ const typeDefs = `
       name: String!
       setBornTo: Int!
     ): Author
-  }    
+  }   
+  type Subscription {
+    bookAdded: Book!
+  } 
 `
+// Above subscriptions for subscribing for notifications about new books added
+
 
 module.exports = typeDefs

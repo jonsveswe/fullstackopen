@@ -1,27 +1,27 @@
 const { ApolloServer } = require('@apollo/server')
-const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer')
-const { expressMiddleware } = require('@apollo/server/express4')
-const { makeExecutableSchema } = require('@graphql-tools/schema')
-
-const { WebSocketServer } = require('ws')
-const { useServer } = require('graphql-ws/lib/use/ws')
-// const { useServer } = require('graphql-ws/use/ws')
-
-const http = require('http')
-const express = require('express')
-const bodyParser = require('body-parser')
-const cors = require('cors')
-
-const jwt = require('jsonwebtoken')
+const { startStandaloneServer } = require('@apollo/server/standalone')
+const { v4: uuid } = require('uuid')
+const { GraphQLError } = require('graphql')
 const mongoose = require('mongoose')
-mongoose.set('strictQuery', false)
+const Author = require('./models/author')
+const Book = require('./models/book')
 const User = require('./models/user')
-
 const typeDefs = require('./schema')
 const resolvers = require('./resolvers')
-
 require('dotenv').config()
+const jwt = require('jsonwebtoken')
+const { expressMiddleware } = require('@apollo/server/express4')
+const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+const express = require('express')
+const cors = require('cors')
+const http = require('http')
+const { WebSocketServer } = require('ws')
+const { useServer } = require('graphql-ws/use/ws')
+// const { useServer } = require('graphql-ws/lib/use/ws')
+const bodyParser = require('body-parser')
 
+mongoose.set('strictQuery', false)
 const MONGODB_URI = process.env.MONGODB_URI
 
 console.log('connecting to', MONGODB_URI)
@@ -34,11 +34,12 @@ mongoose.connect(MONGODB_URI)
     console.log('error connection to MongoDB:', error.message)
   })
 
-// setup is now within a function
+// When queries and mutations are used, GraphQL uses the HTTP protocol in the communication.
+// In case of subscriptions, the communication between client and server happens with WebSockets.
+// The code registers a WebSocketServer object to listen the WebSocket connections, besides the usual HTTP connections that the server listens to.
 const start = async () => {
   const app = express()
   const httpServer = http.createServer(app)
-
   const wsServer = new WebSocketServer({
     server: httpServer,
     path: '/',
