@@ -23,8 +23,8 @@ mongoose.connect(MONGODB_URI)
   })
 
 // typeDefs = The schema.
-// The type of the field id is ID. ID fields are strings, but GraphQL ensures they are unique. 
-// If no exclamaiton mark it means it is not required and can be null. 
+// The type of the field id is ID. ID fields are strings, but GraphQL ensures they are unique.
+// If no exclamaiton mark it means it is not required and can be null.
 // NOTE: These types, e.g. Book, does not need to be defined the same way as it is stored in the database.
 // The mutation has a return valure of type Person. Value for the field id is not given as a parameter. Generating an id is better left for the server.
 const typeDefs = `
@@ -103,7 +103,7 @@ const resolvers = {
       if (args.genre) {
         // return books.filter(b => b.genres.includes(args.genre))
         return await Book.find({ genres: args.genre })
-      } 
+      }
       return await Book.find({})
     },
     allAuthors: async () => await Author.find({})
@@ -118,10 +118,40 @@ const resolvers = {
       return booksByAuthor.length
     }
   },
+  Book: {
+    author: async (root) => {
+      console.log('root in Book->author: ', root)
+      /* root in Book->author:  {
+        _id: new ObjectId('67ee694baf375d05933af10d'),
+        title: 'Clean Code',
+        published: 2008,
+        author: new ObjectId('67ee60bde8e0049c8a60e92b'),
+        genres: [ 'refactoring' ],
+        __v: 0
+      }
+      root in Book->author:  {
+        _id: new ObjectId('67ee6a79e937c913d55a3282'),
+        title: 'Agile software development',
+        published: 2002,
+        author: new ObjectId('67ee60bde8e0049c8a60e92b'),
+        genres: [ 'agile', 'patterns', 'design' ],
+        __v: 0
+      }
+      root in Book->author:  {
+        _id: new ObjectId('67f0e16a2fc5f19c3df9c065'),
+        title: 'title123',
+        published: 1982,
+        author: new ObjectId('67ee60bde8e0049c8a60e92b'),
+        genres: [ 'classic', 'dfkfk' ],
+        __v: 0
+      } */
+      return await Author.findById(root.author)
+    }
+  },
   Mutation: {
     createUser: async (root, args) => {
       const user = new User({ username: args.username, favoriteGenre: args.favoriteGenre })
-  
+
       return user.save()
         .catch(error => {
           throw new GraphQLError('Creating the user failed', {
@@ -142,34 +172,42 @@ const resolvers = {
       if ( !user || args.password !== '1234' ) {
         throw new GraphQLError('wrong credentials', {
           extensions: { code: 'BAD_USER_INPUT' }
-        })        
+        })
       }
-  
+
       const userForToken = {
         username: user.username,
         id: user._id,
       }
-      
+
       const token = jwt.sign(userForToken, process.env.SECRET)
       return { value: token }
     },
-    addBook: async (root, args) => {
+    addBook: async (root, args, context) => {
       /*
       root: undefined
       args:  {
         title: 'Pimeyden tango',
-        published: 1997,        
-        author: 'Reijo Mäki',   
-        genres: [ 'crime' ]     
-      } 
+        published: 1997,
+        author: 'Reijo Mäki',
+        genres: [ 'crime' ]
+      }
       */
       console.log('root: ', root)
       console.log('args: ', args)
 
+      if(!context.currentUser) {
+        throw new GraphQLError('Not authenticated', {
+          extensions: {
+            code: 'UNAUTHENTICATED'
+          }
+        })
+      }
+
       const author = await Author.findOne({ name: args.author })
       console.log('author: ', author)
-        // Some of the error handling can be automatically done with GraphQL validation (e.g. check required fields). However, GraphQL cannot handle everything automatically. 
-      // The extensions object is used to convey more info about the cause of the error to the caller. 
+      // Some of the error handling can be automatically done with GraphQL validation (e.g. check required fields). However, GraphQL cannot handle everything automatically.
+      // The extensions object is used to convey more info about the cause of the error to the caller.
       if (!author) {
         throw new GraphQLError('Author not found', {
           extensions: {
@@ -194,7 +232,14 @@ const resolvers = {
       return book
 
     },
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, context) => {
+      if(!context.currentUser) {
+        throw new GraphQLError('Not authenticated', {
+          extensions: {
+            code: 'UNAUTHENTICATED'
+          }
+        })
+      }
       const author = await Author.findOne({ name: args.name })
       if (!author) {
         throw new GraphQLError('Author not found', {
@@ -206,7 +251,7 @@ const resolvers = {
       }
       author.born = args.setBornTo
       return author.save()
-    }    
+    }
   }
 }
 
@@ -228,9 +273,6 @@ startStandaloneServer(server, {
         .findById(decodedToken.id)
       return { currentUser }
     }
-    throw new GraphQLError('wrong credentials', {
-      extensions: { code: 'BAD_USER_INPUT' }
-    })      
   },
 }).then(({ url }) => {
   console.log(`Server ready at ${url}`)

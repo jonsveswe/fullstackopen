@@ -13,12 +13,19 @@ const NewBook = (props) => {
 
   // The refetchQueries option is used to automatically update the cache after a mutation.
   // It will refetch the query from the server and update the cache with the new data.
-  const [createPerson] = useMutation(CREATE_BOOK, {
+  const [createBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query: ALL_AUTHORS }, { query: ALL_BOOKS }],
     onError: (error) => {
       const messages = error.graphQLErrors.map(e => e.message).join('\n')
       notifyHandler(messages)
-    }
+    },
+    /*     update: (cache, response) => {      
+          cache.updateQuery({ query: ALL_AUTHORS }, ({ allAuthors }) => {        
+            return {          
+              allPersons: allAuthors.concat(response.data.addBook.author),        
+            }      
+          })    
+        }, */
   })
 
   if (!props.show) {
@@ -28,7 +35,7 @@ const NewBook = (props) => {
   const submit = async (event) => {
     event.preventDefault()
 
-    createPerson({ variables: { title, author, published: Number(published), genres } })
+    createBook({ variables: { title, author, published: Number(published), genres } })
 
     setTitle('')
     setPublished('')

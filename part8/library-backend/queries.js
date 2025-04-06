@@ -31,6 +31,19 @@ query ExampleQuery {
   }
 }
 
+query AllBooks {
+  allBooks{
+    title
+    published
+    genres
+    author {
+      bookCount
+      born
+      name
+    }
+  }
+}
+
 mutation {
   addBook(
     title: "Pimeyden tango",
