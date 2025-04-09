@@ -49,14 +49,14 @@ const parseVisibility = (visibility: unknown): Visibility => {
 };
 
 // Unfortunately we can not define the Zod schema based on TypeScript type definitions, and due to this, the duplication in the type and schema definitions is hard to avoid.
-export const newEntrySchema = z.object({
+export const NewEntrySchema = z.object({
   weather: z.nativeEnum(Weather),
   visibility: z.nativeEnum(Visibility),
   date: z.string().date(),
   comment: z.string().optional()
 });
 export const toNewDiaryEntry = (object: unknown): NewDiaryEntry => {
-  return newEntrySchema.parse(object);
+  return NewEntrySchema.parse(object);
 };
 
 /* export const toNewDiaryEntry = (object: unknown): NewDiaryEntry => {
@@ -135,7 +135,18 @@ const parseSSN = (ssn: unknown): string => {
   return ssn;
 };
 
+export const NewPatientEntrySchema = z.object({
+  name: z.string(),
+  dateOfBirth: z.string().date(),
+  gender: z.nativeEnum(Gender),
+  occupation: z.string(),
+  ssn: z.string()
+});
 export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
+  return NewPatientEntrySchema.parse(object);
+};
+
+/* export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   if ( !object || typeof object !== 'object' ) {
     throw new Error('Incorrect or missing data');
   }
@@ -153,4 +164,4 @@ export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   }
 
   throw new Error('Incorrect data: some fields are missing');
-};
+}; */
