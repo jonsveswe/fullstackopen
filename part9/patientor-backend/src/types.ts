@@ -1,5 +1,7 @@
 /* export type Weather = 'sunny' | 'rainy' | 'cloudy' | 'windy' | 'stormy';
 export type Visibility = 'great' | 'good' | 'ok' | 'poor'; */
+import { z } from 'zod';
+import { newEntrySchema } from './utils/utils';
 export enum Weather {
   Sunny = 'sunny',
   Rainy = 'rainy',
@@ -19,9 +21,14 @@ export interface DiaryEntry {
   date: string;
   weather: Weather;
   visibility: Visibility;
-  comment: string;
+  comment?: string;
 }
-export type NewDiaryEntry = Omit<DiaryEntry, 'id'>;
+// export type NewDiaryEntry = Omit<DiaryEntry, 'id'>;
+// infer the type from schema
+export type NewDiaryEntry = z.infer<typeof newEntrySchema>; 
+/* export interface DiaryEntry extends NewDiaryEntry {
+  id: number;
+} */
 export type NonSensitiveDiaryEntry = Omit<DiaryEntry, 'comment'>;
 
 // ################################################################### //
