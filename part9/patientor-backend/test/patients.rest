@@ -1,0 +1,24 @@
+GET http://localhost:3000/api/patients
+###
+POST http://localhost:3000/api/patients
+content-type: application/json
+
+{
+  "name": "jonas2",
+  "dateOfBirth": "2025-01-14",
+  "gender": "male",
+  "occupation": "polis",
+  "ssn": "1234"
+}
+###
+// Incorrect gender: asd
+POST http://localhost:3000/api/patients
+content-type: application/json
+
+{
+  "name": "jonas2",
+  "dateOfBirth": "2025-01-14",
+  "gender": "asd",
+  "occupation": "polis",
+  "ssn": "1234"
+}

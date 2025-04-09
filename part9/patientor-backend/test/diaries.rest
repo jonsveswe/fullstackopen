@@ -1,0 +1,25 @@
+
+GET http://localhost:3000/api/diaries
+###
+GET http://localhost:3000/api/diaries/1
+###
+POST http://localhost:3000/api/diaries
+content-type: application/json
+
+{
+  "date": "2025-01-14",
+  "weather": "sunny",
+  "visibility": "poor",
+  "comment": "Jaja väldigt bra"
+}
+###
+// Error: Incorrect visibility: bad
+POST http://localhost:3000/api/diaries
+content-type: application/json
+
+{
+  "date": "2025-01-14",
+  "weather": "sunny",
+  "visibility": "bad",
+  "comment": "Jaja väldigt bra"
+}
