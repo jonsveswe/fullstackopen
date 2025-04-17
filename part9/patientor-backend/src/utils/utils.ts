@@ -1,5 +1,5 @@
 import { NewDiaryEntry, Weather, Visibility } from "../types";
-import { NewPatientEntry, Gender } from "../types";
+import { NewPatientEntry, Gender, Entry } from "../types";
 import z from 'zod';
 
 // Type guard
@@ -135,12 +135,30 @@ const parseSSN = (ssn: unknown): string => {
   return ssn;
 };
 
+const EntrySchema = z.object({
+  description: z.string(),
+/*   date: z.string().date(),
+  type: z.string(),
+  specialist: z.string(),
+  diagnosisCodes: z.array(z.string()).optional(),
+  description: z.string(),
+  discharge: z.object({
+    date: z.string().date(),
+    criteria: z.string()
+  }).optional(),
+  employerName: z.string().optional(),
+  sickLeave: z.object({
+    startDate: z.string().date(),
+    endDate: z.string().date()
+  }).optional() */
+});
 export const NewPatientEntrySchema = z.object({
   name: z.string(),
   dateOfBirth: z.string().date(),
   gender: z.nativeEnum(Gender),
   occupation: z.string(),
-  ssn: z.string()
+  ssn: z.string(),
+  entries: z.array(EntrySchema)
 });
 export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   return NewPatientEntrySchema.parse(object);

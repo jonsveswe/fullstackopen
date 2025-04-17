@@ -16,6 +16,11 @@ const getNonSensitivePatientDataEntries = (): NonSensitivePatientDataEntry[] => 
   }));
 };
 
+const findById = (id: string): Patient | undefined => { 
+  const entry = patients.find(p => p.id === id);
+  return entry;
+};
+
 const addPatient = ( entry : NewPatientEntry): Patient => {
   const newPatientEntry = {
     // id: Math.max(...diaries.map(d => d.id)) + 1,
@@ -29,5 +34,6 @@ const addPatient = ( entry : NewPatientEntry): Patient => {
 export default {
   getEntries,
   getNonSensitivePatientDataEntries,
-  addPatient
+  addPatient,
+  findById
 };

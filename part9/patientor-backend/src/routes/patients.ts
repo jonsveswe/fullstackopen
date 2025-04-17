@@ -30,6 +30,16 @@ router.get('/', (_req, res: Response<NonSensitivePatientDataEntry[]>) => {
   res.send(PatientService.getNonSensitivePatientDataEntries());
 });
 
+router.get('/:id', (req, res: Response<Patient>) => {
+  const patient = PatientService.findById(req.params.id);
+
+  if (patient) {
+    res.send(patient);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
 // The middleware newPatientParser is used to check that the request body is a proper new patient entry
 router.post('/', newPatientParser, (req: Request<unknown, unknown, NewPatientEntry>, res: Response<Patient>) => {
     const addedEntry = PatientService.addPatient(req.body);  
