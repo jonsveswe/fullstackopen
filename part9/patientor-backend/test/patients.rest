@@ -10,10 +10,11 @@ content-type: application/json
   "dateOfBirth": "2025-01-14",
   "gender": "male",
   "occupation": "polis",
-  "ssn": "1234"
+  "ssn": "1234",
+  "entries": []
 }
 ###
-// Incorrect gender: asd
+// Incorrect gender asd and no entries.
 POST http://localhost:3000/api/patients
 content-type: application/json
 
@@ -23,4 +24,60 @@ content-type: application/json
   "gender": "asd",
   "occupation": "polis",
   "ssn": "1234"
+}
+
+###
+// Type HealthCheck
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+content-type: application/json
+
+{
+  "description": "en beskrivning",
+  "date": "2025-01-03",
+  "specialist": "Dr. Who",
+  "diagnosisCodes": ["kod1", "kod2"],
+  "type": "HealthCheck",
+  "healthCheckRating": 3  
+}
+
+###
+//Type Hospital
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+content-type: application/json
+
+{
+  "description": "en beskrivning 2",
+  "date": "2025-02-14",
+  "specialist": "Dr. Who",
+  "diagnosisCodes": ["kod3", "kod4"],
+  "type": "Hospital",
+  "discharge": {"date": "2025-02-11", "criteria": "hypo"}  
+}
+###
+// Type OccupationalHealthcare 
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+content-type: application/json
+
+{
+  "description": "en beskrivning 3",
+  "date": "2025-02-27",
+  "specialist": "Dr. Who",
+  "diagnosisCodes": ["kod1", "kod3"],
+  "type": "OccupationalHealthcare",
+  "employerName": "företag1",
+  "sickLeave": {"startDate": "2025-02-19", "endDate": "2025-02-24"}  
+}
+
+###
+// Missing required specialist
+POST http://localhost:3000/api/patients/d2773336-f723-11e9-8f0b-362b9e155667/entries
+content-type: application/json
+
+{
+  "description": "en beskrivning 3",
+  "date": "2025-02-27",
+  "diagnosisCodes": ["kod1", "kod3"],
+  "type": "OccupationalHealthcare",
+  "employerName": "företag1",
+  "sickLeave": {"startDate": "2025-02-19", "endDate": "2025-02-24"}  
 }

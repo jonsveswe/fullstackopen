@@ -1,4 +1,4 @@
-import { NewDiaryEntry, Weather, Visibility } from "../types";
+import { NewDiaryEntry, Weather, Visibility, Diagnosis } from "../types";
 import { NewPatientEntry, Gender, Entry } from "../types";
 import z from 'zod';
 
@@ -135,12 +135,24 @@ const parseSSN = (ssn: unknown): string => {
   return ssn;
 };
 
-const EntrySchema = z.object({
-  description: z.string(),
-/*   date: z.string().date(),
+// Don't think we need this if we are using Zod. Correct. 
+export const parseDiagnosisCodes = (object: unknown): Array<Diagnosis['code']> =>  {
+  if (!object || typeof object !== 'object' || !('diagnosisCodes' in object)) {
+    // we will just trust the data to be in correct form
+    return [] as Array<Diagnosis['code']>;
+  }
+  return object.diagnosisCodes as Array<Diagnosis['code']>;
+};
+
+/* const DiagnosisCodeSchema = z.object({
+  code: z.string()
+}); */
+export const EntrySchema = z.object({
+  id: z.string().optional(),
+  date: z.string().date(),
   type: z.string(),
   specialist: z.string(),
-  diagnosisCodes: z.array(z.string()).optional(),
+  diagnosisCodes: z.array(z.string()).optional(), //z.array(DiagnosisCodeSchema).optional(),
   description: z.string(),
   discharge: z.object({
     date: z.string().date(),
@@ -150,7 +162,8 @@ const EntrySchema = z.object({
   sickLeave: z.object({
     startDate: z.string().date(),
     endDate: z.string().date()
-  }).optional() */
+  }).optional(),
+  healthCheckRating: z.number().min(0).max(3).optional()
 });
 export const NewPatientEntrySchema = z.object({
   name: z.string(),
@@ -160,9 +173,9 @@ export const NewPatientEntrySchema = z.object({
   ssn: z.string(),
   entries: z.array(EntrySchema)
 });
-export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
+/* export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   return NewPatientEntrySchema.parse(object);
-};
+}; */
 
 /* export const toNewPatientEntry = (object: unknown): NewPatientEntry => {
   if ( !object || typeof object !== 'object' ) {
