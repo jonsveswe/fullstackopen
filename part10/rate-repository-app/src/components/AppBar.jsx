@@ -2,6 +2,8 @@ import { View, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { Link } from 'react-router-native';
 import Constants from 'expo-constants';
 import Text from './Text';
+import { useQuery } from '@apollo/client';
+import { ME } from '../graphql/queries';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,15 +21,20 @@ const styles = StyleSheet.create({
 });
 
 const AppBar = () => {
+  const { data } = useQuery(ME, { fetchPolicy: 'cache-and-network' });
+  console.log('useQuery in AppBar data: ', data);
   return (
     <View style={styles.container}>
       <ScrollView horizontal={true}>
         <Link style={styles.link} to={'/'} >
           <Text style={{ color: '#ffffff' }}>Repositories</Text>
         </Link>
-        <Link style={styles.link} to={'/signin'} >
+        {data?.me && <Link style={styles.link} to={'/signout'} >
+          <Text style={{ color: '#ffffff' }}>Sign out</Text>
+        </Link>}
+        {!data?.me && <Link style={styles.link} to={'/signin'} >
           <Text style={{ color: '#ffffff' }}>Sign in</Text>
-        </Link>
+        </Link>}
       </ScrollView>
     </View>
   );

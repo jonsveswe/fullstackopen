@@ -5,6 +5,7 @@ import RepositoryList from './RepositoryList';
 import Text from './Text';
 import AppBar from './AppBar';
 import SignIn from './SignIn';
+import SignOut from './SignOut';
 
 const styles = StyleSheet.create({
   container: {
@@ -28,6 +29,7 @@ const styles = StyleSheet.create({
 }); */
 
 const Main = () => {
+  console.log('render main');
   return (
     <View style={styles.container}>
       <AppBar />
@@ -35,6 +37,7 @@ const Main = () => {
       <Routes>
         <Route path="/" element={<RepositoryList />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/signout" element={<SignOut />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </View>
