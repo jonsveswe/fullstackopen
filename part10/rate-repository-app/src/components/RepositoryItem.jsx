@@ -25,11 +25,11 @@ const styles = StyleSheet.create({
 const RepositoryItem = (props) => {
   const { fullName, description, language, stargazersCount, forksCount, ratingAverage, reviewCount, ownerAvatarUrl } = props.item;
   return (
-    <View style={styles.container}>
+    <View testID='repositoryItem' style={styles.container}>
       <View style={{ flexDirection: 'row' }}>
         <Image style={styles.logo} source={{ uri: ownerAvatarUrl }} />
         <View style={{ marginLeft: 10 }}>
-          <Text style={styles.fullName}>{fullName}</Text>
+          <Text testID='fullName' style={styles.fullName}>{fullName}</Text>
           <Text style={styles.description}>{description}</Text>
           <Text style={styles.language}>{language}</Text>
         </View>
