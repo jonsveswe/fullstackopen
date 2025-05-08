@@ -4,12 +4,13 @@ import { gql } from '@apollo/client';
 /* AllRepositoriesOrderBy can be either "CREATED_AT" or "RATING_AVERAGE".
   OrderDirection can be either "ASC" or "DESC". */
 export const GET_REPOSITORIES = gql`
-  query ($orderBy: AllRepositoriesOrderBy, $orderDirection: OrderDirection, $searchKeyword: String) {
-   repositories (orderBy: $orderBy, orderDirection: $orderDirection, searchKeyword: $searchKeyword) {
+  query ($first: Int, $after: String, $orderBy: AllRepositoriesOrderBy, $orderDirection: OrderDirection, $searchKeyword: String) {
+   repositories (first: $first, after: $after, orderBy: $orderBy, orderDirection: $orderDirection, searchKeyword: $searchKeyword) {
       edges {
         node {
           id
           fullName
+          createdAt
           description
           language
           stargazersCount
@@ -19,6 +20,12 @@ export const GET_REPOSITORIES = gql`
           ownerAvatarUrl
           url
         }
+        cursor
+      }
+      pageInfo {
+        endCursor
+        startCursor
+        hasNextPage
       }
     }   
   }`;
@@ -60,7 +67,7 @@ export const GET_REPOSITORIES = gql`
   }`; */
 
 export const GET_SINGLE_REPOSITORY = gql`
-  query ($repositoryId: ID!) {
+  query ($first: Int, $after: String, $repositoryId: ID!) {
     repository(id: $repositoryId) {
       id
       fullName
@@ -72,7 +79,7 @@ export const GET_SINGLE_REPOSITORY = gql`
       reviewCount
       ownerAvatarUrl
       url
-      reviews {
+      reviews(first: $first, after: $after) {
         edges {
           node {
             id
@@ -84,6 +91,12 @@ export const GET_SINGLE_REPOSITORY = gql`
               username
             }
           }
+          cursor
+        }
+        pageInfo {
+          endCursor
+          startCursor
+          hasNextPage
         }
       }
     }

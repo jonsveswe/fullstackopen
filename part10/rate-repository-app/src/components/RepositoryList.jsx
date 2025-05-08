@@ -18,7 +18,7 @@ const ItemSeparator = () => <View style={styles.separator} />;
 // To enable easy testing, we extract the components "pure" code into another component, such as the RepositoryListContainer component.
 // Now, the RepositoryList component contains only the side effects and its implementation is quite simple. We can test the RepositoryListContainer component 
 // by providing it with paginated repository data through the repositories prop and checking that the rendered content has the correct information.
-export const RepositoryListContainer = ({ repositories, orderBy, orderDirection, searchString, setSearchString, setOrderBy, setOrderDirection }) => {
+export const RepositoryListContainer = ({ repositories, onEndReached, orderBy, orderDirection, searchString, setSearchString, setOrderBy, setOrderDirection }) => {
   const navigate = useNavigate();
   // Get the nodes from the edges array
   const repositoryNodes = repositories
@@ -60,35 +60,8 @@ export const RepositoryListContainer = ({ repositories, orderBy, orderDirection,
       <FlatList
         data={repositoryNodes}
         ItemSeparatorComponent={ItemSeparator}
-        /*       ListHeaderComponent={() => {
-                return (
-                  <View>
-                    <TextInput
-                      value={searchString}
-                      onChangeText={(text) => setSearchString(text)}
-                      placeholder="Search"
-                    />
-                    <View style={{ flexDirection: 'row' }}>
-                      <Picker
-                        selectedValue={orderBy}
-                        onValueChange={(itemValue, itemIndex) =>
-                          setOrderBy(itemValue)
-                        }>
-                        <Picker.Item label="Latest repositories" value="CREATED_AT" />
-                        <Picker.Item label="Average rating" value="RATING_AVERAGE" />
-                      </Picker>
-                      <Picker
-                        selectedValue={orderDirection}
-                        onValueChange={(itemValue, itemIndex) =>
-                          setOrderDirection(itemValue)
-                        }>
-                        <Picker.Item label="Descending" value="DESC" />
-                        <Picker.Item label="Ascending" value="ASC" />
-                      </Picker>
-                    </View>
-                  </View>
-                )
-              }} */
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.1}
         renderItem={({ item }) => {
           return (
             <Pressable onPress={() => onPressHandler(item)}>
@@ -107,11 +80,26 @@ const RepositoryList = () => {
   const [debouncedSearchString] = useDebounce(searchString, 500);
   const [orderDirection, setOrderDirection] = useState('DESC');
   const [orderBy, setOrderBy] = useState('RATING_AVERAGE');
+  const first = 8;
+  const { repositories, fetchMore } = useRepositories(first, orderBy, orderDirection, debouncedSearchString);
 
-  const { repositories } = useRepositories(orderBy, orderDirection, debouncedSearchString);
+  const onEndReachedHandler = () => {
+    console.log('onEndReachedHandler');
+    fetchMore();
+    /*     fetchMore({
+          variables: {
+            first: first,
+            after: repositories.pageInfo.endCursor,
+            orderBy: orderBy,
+            orderDirection: orderDirection,
+            searchKeyword: searchString,
+          },
+        }); */
+  }
 
   return <RepositoryListContainer
     repositories={repositories}
+    onEndReached={onEndReachedHandler}
     orderBy={orderBy}
     orderDirection={orderDirection}
     setOrderBy={setOrderBy}

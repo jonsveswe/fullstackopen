@@ -1,6 +1,6 @@
 import RepositoryItem from "./RepositoryItem";
 import { useParams } from "react-router-native";
-import { useRepository } from "../hooks/useRepository";
+import useRepository from "../hooks/useRepository";
 import { Linking, Pressable, Text, FlatList, StyleSheet } from "react-native";
 import { Button, View } from "react-native-web";
 
@@ -8,13 +8,17 @@ const styles = StyleSheet.create({
   separator: {
     height: 10,
   },
+  container: {
+    padding: 20,
+    backgroundColor: '#ffffff',
+  },
 });
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
 const ReviewItem = ({ review }) => {
   return (
-    <View style={{ marginBottom: 10 }}>
+    <View style={styles.container}>
       <Text style={{ fontWeight: 'bold' }}>{review.user.username}</Text>
       <Text>{review.createdAt.split('T')[0]}</Text>
       <Text>{review.text}</Text>
@@ -24,7 +28,8 @@ const ReviewItem = ({ review }) => {
 
 const SingleRepository = () => {
   const { id } = useParams();
-  const { repository } = useRepository(id);
+  const first = 4;
+  const { repository, fetchMore } = useRepository(first, id);
   if (!repository) {
     return null;
   }
@@ -34,7 +39,8 @@ const SingleRepository = () => {
     : [];
 
   return (
-    <View>
+    /* Had to add flex here otherwise no scrollbars. */
+    <View style={{ flex: 1 }}>
       {/* <RepositoryItem item={repository} /> */}
       <Pressable style={{ marginTop: 10, backgroundColor: '#0366d6', borderRadius: 1 }} onPress={() => Linking.openURL(repository.url)}>
         <Text>Open in GitHub</Text>
@@ -42,9 +48,11 @@ const SingleRepository = () => {
       <FlatList
         data={reviewNodes}
         ItemSeparatorComponent={ItemSeparator}
+        onEndReached={() => fetchMore()}
+        onEndReachedThreshold={0.1}
         renderItem={({ item }) => <ReviewItem review={item} />}
         keyExtractor={({ id }) => id}
-        ListHeaderComponent={() => <RepositoryItem item={repository} />}
+      /*  ListHeaderComponent={() => <RepositoryItem item={repository} />} */
       />
 
     </View>

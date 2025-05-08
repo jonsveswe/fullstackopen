@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   },
 })
 const RepositoryItem = (props) => {
-  console.log('props in RepositoryItem: ', props);
+  // console.log('props in RepositoryItem: ', props);
   const { fullName, description, language, stargazersCount, forksCount, ratingAverage, reviewCount, ownerAvatarUrl } = props.item;
   /*   const { id } = useParams();
     const navigate = useNavigate(); */
