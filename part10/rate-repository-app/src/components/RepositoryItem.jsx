@@ -1,4 +1,5 @@
-import { FlatList, View, StyleSheet, Image } from 'react-native';
+import { FlatList, View, StyleSheet, Image, Pressable } from 'react-native';
+import { useParams, useNavigate } from 'react-router-native';
 import Text from './Text';
 const styles = StyleSheet.create({
   container: {
@@ -23,8 +24,16 @@ const styles = StyleSheet.create({
   },
 })
 const RepositoryItem = (props) => {
+  console.log('props in RepositoryItem: ', props);
   const { fullName, description, language, stargazersCount, forksCount, ratingAverage, reviewCount, ownerAvatarUrl } = props.item;
+  /*   const { id } = useParams();
+    const navigate = useNavigate(); */
+  /*   const item = items.find(i => i.id === id);
+    if (!item) {
+      return <p>Item not found</p>;
+    } */
   return (
+
     <View testID='repositoryItem' style={styles.container}>
       <View style={{ flexDirection: 'row' }}>
         <Image style={styles.logo} source={{ uri: ownerAvatarUrl }} />
@@ -41,6 +50,7 @@ const RepositoryItem = (props) => {
         <Text fontWeight={'bold'}>{reviewCount}</Text>
       </View>
     </View>
+
   );
 };
 
